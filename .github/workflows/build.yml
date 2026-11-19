@@ -129,17 +129,35 @@ jobs:
           OVERVIEW="Automatic scrobbling to your CueMore profile."
           IMG="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/branding/cuemore.png"
 
+          # Keep version history: merge the new entries with whatever the
+          # manifests already list, dedupe by version+ABI (new wins), sort
+          # newest-first, and cap each ABI at 8 entries so the file stays small.
+          OLD_MAIN=$(jq -c '.[0].versions // []' manifest.json 2>/dev/null || echo '[]')
+          OLD_LTS=$(jq -c '.[0].versions // []' lts/manifest.json 2>/dev/null || echo '[]')
+
           jq -n \
             --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" --arg img "$IMG" \
-            --argjson stable "$STABLE_ENTRY" --argjson v12 "$V12_ENTRY" \
-            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"CueMore", imageUrl:$img, versions:[$v12, $stable]}]' \
+            --argjson new "[$V12_ENTRY, $STABLE_ENTRY]" \
+            --argjson old "$OLD_MAIN" \
+            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"CueMore", imageUrl:$img,
+               versions: (($new + $old)
+                 | unique_by(.version + "|" + .targetAbi)
+                 | sort_by(.version | split(".") | map(tonumber)) | reverse
+                 | group_by(.targetAbi) | map(.[0:8]) | add
+                 | sort_by(.targetAbi))}]' \
             > manifest.json
 
           mkdir -p lts
           jq -n \
             --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" --arg img "$IMG" \
-            --argjson lts "$LTS_ENTRY" \
-            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"CueMore", imageUrl:$img, versions:[$lts]}]' \
+            --argjson new "[$LTS_ENTRY]" \
+            --argjson old "$OLD_LTS" \
+            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"CueMore", imageUrl:$img,
+               versions: (($new + $old)
+                 | unique_by(.version + "|" + .targetAbi)
+                 | sort_by(.version | split(".") | map(tonumber)) | reverse
+                 | group_by(.targetAbi) | map(.[0:8]) | add
+                 | sort_by(.targetAbi))}]' \
             > lts/manifest.json
 
           git config user.name github-actions
