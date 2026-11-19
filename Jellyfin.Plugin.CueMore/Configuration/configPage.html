@@ -16,8 +16,7 @@
 
       #CueMoreConfigPage button#mqConnectBtn,
       #CueMoreConfigPage button#mqCancelPairingBtn,
-      #CueMoreConfigPage button#mqDisconnectBtn,
-      #CueMoreConfigPage button#mqSaveBtn {
+      #CueMoreConfigPage button#mqDisconnectBtn {
         background:
           radial-gradient(circle at 15% -10%, rgb(88, 28, 135), #7c3aed 84%),
           radial-gradient(circle at 90% 0%, transparent 35%),
@@ -32,14 +31,12 @@
       }
       #CueMoreConfigPage button#mqConnectBtn:hover,
       #CueMoreConfigPage button#mqCancelPairingBtn:hover,
-      #CueMoreConfigPage button#mqDisconnectBtn:hover,
-      #CueMoreConfigPage button#mqSaveBtn:hover {
+      #CueMoreConfigPage button#mqDisconnectBtn:hover {
         filter: brightness(1.1);
       }
       #CueMoreConfigPage button#mqConnectBtn span,
       #CueMoreConfigPage button#mqCancelPairingBtn span,
-      #CueMoreConfigPage button#mqDisconnectBtn span,
-      #CueMoreConfigPage button#mqSaveBtn span {
+      #CueMoreConfigPage button#mqDisconnectBtn span {
         color: #fff !important;
       }
 
@@ -73,15 +70,6 @@
           <a href="https://cuemore.vercel.app" target="_blank" rel="noopener">CueMore</a>
           profile. Finished movies and episodes are marked as watched automatically.
         </p>
-        <p class="fieldDescription">
-          <a href="https://github.com/CueMore/CueMore-Jellyfin-Plugin" target="_blank" rel="noopener">Source code</a>
-          · by <a href="https://github.com/CueMore" target="_blank" rel="noopener">CueMore</a>
-        </p>
-
-        <div style="display:flex; gap:8px; margin-top:12px;">
-          <button is="emby-button" id="mqSaveBtn" type="button"><span>Save</span></button>
-        </div>
-        <p class="fieldDescription" id="mqSaveStatus"></p>
       </div>
 
       <div class="verticalSection">
@@ -377,8 +365,6 @@
       })
         .then(function () {
           Dashboard.hideLoadingMsg();
-          $('mqSaveStatus').textContent = 'Saved.';
-          setTimeout(function () { $('mqSaveStatus').textContent = ''; }, 3000);
         })
         .catch(function (err) { alertError('Could not save settings', err); });
     }
@@ -390,7 +376,6 @@
       $('mqConnectBtn').addEventListener('click', startPairing);
       $('mqCancelPairingBtn').addEventListener('click', cancelPairing);
       $('mqDisconnectBtn').addEventListener('click', disconnect);
-      $('mqSaveBtn').addEventListener('click', saveSettings);
       $('mqUserSelect').addEventListener('change', renderSelected);
 
       var playing = $('mqTogglePlaying');
