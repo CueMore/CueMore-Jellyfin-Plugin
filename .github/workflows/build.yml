@@ -30,7 +30,7 @@ jobs:
           VER="${TAG#v}"
           echo "version=${VER}" >> "$GITHUB_OUTPUT"
           echo "assembly=${VER}.0" >> "$GITHUB_OUTPUT"
-          echo "v12=${VER}.1" >> "$GITHUB_OUTPUT"
+          echo "v12=${VER}.0" >> "$GITHUB_OUTPUT"
 
       - name: Install JPRM
         run: pip install jprm
@@ -127,7 +127,7 @@ jobs:
           GUID="7c2e9f4a-1b3d-4e5f-9a8b-2c4d6e8f0a1b"
           DESC="Automatic scrobbling to your Marquee profile. Finished movies and episodes in Jellyfin are marked as watched in Marquee. One-click pairing via code."
           OVERVIEW="Automatic scrobbling to your Marquee profile."
-          IMG="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/branding/marquee.svg"
+          IMG="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/branding/marquee.png"
 
           jq -n \
             --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" --arg img "$IMG" \
