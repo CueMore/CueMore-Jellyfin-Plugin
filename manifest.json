@@ -9,20 +9,20 @@
     "imageUrl": "https://raw.githubusercontent.com/CueMore/CueMore-Jellyfin-Plugin/main/branding/cuemore.png",
     "versions": [
       {
-        "version": "0.2.0.1",
-        "changelog": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/tag/v0.2.0",
+        "version": "0.3.1.0",
+        "changelog": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/tag/v0.3.1",
         "targetAbi": "12.0.0.0",
-        "sourceUrl": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/download/v0.2.0/cuemore_0.2.0.1_net10.zip",
-        "checksum": "6a84285d1ddca5a93b3626f57dc9055c",
-        "timestamp": "2026-11-19T14:45:00Z"
+        "sourceUrl": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/download/v0.3.1/cuemore_0.3.1.0_net10.zip",
+        "checksum": "bf6690f21af7624f575ef43957ec5500",
+        "timestamp": "2026-11-19T16:46:07Z"
       },
       {
-        "version": "0.2.0.0",
-        "changelog": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/tag/v0.2.0",
+        "version": "0.3.1.0",
+        "changelog": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/tag/v0.3.1",
         "targetAbi": "10.11.8.0",
-        "sourceUrl": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/download/v0.2.0/cuemore_0.2.0.0_net9.zip",
-        "checksum": "865add1eeb328f44f45d90981cadb059",
-        "timestamp": "2026-11-19T14:45:00Z"
+        "sourceUrl": "https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases/download/v0.3.1/cuemore_0.3.1.0_net9.zip",
+        "checksum": "1509bb6d73a3076e8a85ac99236fde32",
+        "timestamp": "2026-11-19T16:46:07Z"
       }
     ]
   }
