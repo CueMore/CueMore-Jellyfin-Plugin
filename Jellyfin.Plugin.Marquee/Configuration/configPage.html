@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Marquee</title>
+</head>
+<body>
+<div id="MarqueeConfigPage"
+     data-role="page"
+     class="page type-interior pluginConfigurationPage"
+     data-require="emby-input,emby-button,emby-checkbox,emby-select">
+
+    <style>
+      /* Scoped to the Marquee config page */
+      #MarqueeConfigPage a { color: rgb(167, 139, 250); text-decoration: none; }
+      #MarqueeConfigPage a:hover { text-decoration: underline; }
+
+      #MarqueeConfigPage button#mqConnectBtn,
+      #MarqueeConfigPage button#mqCancelPairingBtn,
+      #MarqueeConfigPage button#mqDisconnectBtn,
+      #MarqueeConfigPage button#mqSaveBtn {
+        background:
+          radial-gradient(circle at 15% -10%, rgb(88, 28, 135), #7c3aed 84%),
+          radial-gradient(circle at 90% 0%, transparent 35%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.04)) !important;
+        color: #fff !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.55rem 1.1rem !important;
+        font-weight: 600 !important;
+        cursor: pointer;
+        transition: filter 0.15s ease;
+      }
+      #MarqueeConfigPage button#mqConnectBtn:hover,
+      #MarqueeConfigPage button#mqCancelPairingBtn:hover,
+      #MarqueeConfigPage button#mqDisconnectBtn:hover,
+      #MarqueeConfigPage button#mqSaveBtn:hover {
+        filter: brightness(1.1);
+      }
+      #MarqueeConfigPage button#mqConnectBtn span,
+      #MarqueeConfigPage button#mqCancelPairingBtn span,
+      #MarqueeConfigPage button#mqDisconnectBtn span,
+      #MarqueeConfigPage button#mqSaveBtn span {
+        color: #fff !important;
+      }
+
+      #MarqueeConfigPage .mqLinkedBadge {
+        display: inline-block;
+        font-size: 0.8em;
+        opacity: 0.75;
+        margin-left: 0.4rem;
+      }
+
+      #MarqueeConfigPage .mqUserCode {
+        font-size: 1.6em;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        color: #fff;
+        background: rgba(124, 58, 237, 0.15);
+        border: 1px solid rgba(167, 139, 250, 0.4);
+        border-radius: 8px;
+        padding: 0.4rem 0.9rem;
+        display: inline-block;
+      }
+    </style>
+
+  <div data-role="content">
+    <div class="content-primary">
+
+      <div class="verticalSection verticalSection-extrabottompadding">
+        <h2>Marquee</h2>
+        <p class="fieldDescription">
+          Scrobble what you watch in Jellyfin to your
+          <a href="https://traktlite.vercel.app" target="_blank" rel="noopener">Marquee</a>
+          profile. Finished movies and episodes are marked as watched automatically.
+        </p>
+
+        <div class="inputContainer" style="margin-top:12px; max-width: 480px;">
+          <label class="inputLabel" for="mqApiUrl">Marquee server URL</label>
+          <input id="mqApiUrl" type="text" is="emby-input" />
+          <div class="fieldDescription">
+            The address of your Marquee site — change it if you self-host.
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button is="emby-button" id="mqSaveBtn" type="button"><span>Save</span></button>
+        </div>
+        <p class="fieldDescription" id="mqSaveStatus"></p>
+      </div>
+
+      <div class="verticalSection">
+        <h2>Linked accounts</h2>
+        <p class="fieldDescription">
+          Pick a Jellyfin account and connect it to a Marquee account. Each
+          Jellyfin user links to their own Marquee profile — the pairing code
+          must be confirmed by the Marquee user while logged in.
+        </p>
+
+        <div class="inputContainer" style="max-width: 480px;">
+          <label class="inputLabel" for="mqUserSelect">Jellyfin account</label>
+          <select id="mqUserSelect" is="emby-select"></select>
+        </div>
+
+        <div id="mqStateDisconnected" style="margin-top:16px;">
+          <p id="mqDisconnectedText"></p>
+          <button is="emby-button" id="mqConnectBtn" type="button"><span>Connect to Marquee</span></button>
+        </div>
+
+        <div id="mqStatePairing" style="display:none; margin-top:16px;">
+          <p>
+            Confirm this code while logged in to Marquee:
+          </p>
+          <p class="mqUserCode" id="mqUserCode">········</p>
+          <p style="margin-top:8px;">
+            <a id="mqVerificationLink" href="#" target="_blank" rel="noopener">Open Marquee to confirm</a>
+          </p>
+          <p class="fieldDescription" id="mqPairingStatus">Waiting for confirmation…</p>
+          <button is="emby-button" id="mqCancelPairingBtn" type="button"><span>Cancel</span></button>
+        </div>
+
+        <div id="mqStateConnected" style="display:none; margin-top:16px;">
+          <p>
+            <strong id="mqJellyfinUser"></strong> is linked to Marquee account
+            <strong id="mqUsername"></strong>.
+          </p>
+          <p class="fieldDescription" id="mqStats"></p>
+          <p class="fieldDescription" id="mqInvalidNotice" style="display:none; color:#ffb4b4;">
+            Marquee rejected this account's token — it was probably revoked or
+            re-paired elsewhere. Disconnect and connect again.
+          </p>
+          <button is="emby-button" id="mqDisconnectBtn" type="button"><span>Disconnect</span></button>
+        </div>
+      </div>
+
+      <div class="verticalSection" id="mqEventSettings" style="display:none;">
+        <h2>Events</h2>
+        <div class="checkboxContainer">
+          <label>
+            <input type="checkbox" is="emby-checkbox" id="mqTogglePlaying" />
+            <span>Playback events</span>
+          </label>
+        </div>
+        <div class="checkboxContainer">
+          <label>
+            <input type="checkbox" is="emby-checkbox" id="mqToggleWatched" />
+            <span>Watched marks (manual + automatic)</span>
+          </label>
+        </div>
+        <p class="fieldDescription">
+          Marquee only records finished watches — playback progress is used to
+          detect completion and is not stored as history by itself.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  (function () {
+    'use strict';
+
+    var PLUGIN_PATH = 'Plugins/Marquee';
+    var POLL_INTERVAL_MS = 5000;
+    var pollTimer = null;
+    var bound = false;
+
+    var snapshot = { Links: [] };
+    var jellyfinUsers = [];
+
+    function $(id) { return document.getElementById(id); }
+
+    function normId(id) { return (id || '').toString().replace(/-/g, '').toLowerCase(); }
+
+    function selectedUser() {
+      var sel = $('mqUserSelect');
+      var id = sel ? sel.value : '';
+      return jellyfinUsers.filter(function (u) { return normId(u.Id) === normId(id); })[0] || null;
+    }
+
+    function linkFor(userId) {
+      return (snapshot.Links || []).filter(function (l) {
+        return normId(l.UserId) === normId(userId);
+      })[0] || null;
+    }
+
+    function showState(state) {
+      ['Disconnected', 'Pairing', 'Connected'].forEach(function (s) {
+        var el = $('mqState' + s);
+        if (el) el.style.display = (s === state) ? 'block' : 'none';
+      });
+    }
+
+    function stopPolling() {
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    }
+
+    function apiUrl(path) {
+      return ApiClient.getUrl(PLUGIN_PATH + '/' + path);
+    }
+
+    function postJson(path, body) {
+      return ApiClient.ajax({
+        type: 'POST',
+        url: apiUrl(path),
+        data: JSON.stringify(body || {}),
+        contentType: 'application/json'
+      });
+    }
+
+    function escapeHtml(s) {
+      return (s || '').replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function renderUserOptions() {
+      var sel = $('mqUserSelect');
+      if (!sel) return;
+      var previous = sel.value;
+
+      sel.innerHTML = jellyfinUsers.map(function (u) {
+        var link = linkFor(u.Id);
+        var suffix = link ? ' (' + (link.Username || 'connected') + ')' : '';
+        return '<option value="' + u.Id + '">' + escapeHtml(u.Name) + escapeHtml(suffix) + '</option>';
+      }).join('');
+
+      var keep = jellyfinUsers.some(function (u) { return u.Id === previous; })
+        ? previous
+        : currentUserId();
+      if (keep) sel.value = keep;
+      if (!sel.value && jellyfinUsers.length) sel.value = jellyfinUsers[0].Id;
+    }
+
+    function currentUserId() {
+      try {
+        var id = ApiClient.getCurrentUserId();
+        return jellyfinUsers.some(function (u) { return normId(u.Id) === normId(id); }) ? id : '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function renderSelected() {
+      var user = selectedUser();
+      var link = user ? linkFor(user.Id) : null;
+      var name = user ? user.Name : 'This account';
+
+      $('mqJellyfinUser').textContent = name;
+
+      if (link) {
+        $('mqUsername').textContent = link.Username || '(unknown user)';
+        var last = link.LastScrobbleAt ? new Date(link.LastScrobbleAt).toLocaleString() : 'never';
+        $('mqStats').textContent = link.ScrobbleCount + ' events sent, last at ' + last;
+        $('mqInvalidNotice').style.display = link.Invalid ? 'block' : 'none';
+        showState('Connected');
+      } else {
+        $('mqDisconnectedText').innerHTML =
+          '<strong>' + escapeHtml(name) + '</strong> is not linked to Marquee, so nothing it watches is scrobbled. '
+          + 'Connecting needs a short code confirmed on Marquee while logged in.';
+        showState('Disconnected');
+      }
+
+      $('mqEventSettings').style.display = (snapshot.Links || []).length ? 'block' : 'none';
+    }
+
+    function refreshStatus() {
+      return ApiClient.getJSON(apiUrl('Status')).then(function (s) {
+        snapshot = s || { Links: [] };
+        $('mqApiUrl').value = snapshot.ApiBaseUrl || '';
+        $('mqTogglePlaying').checked = !!snapshot.ScrobblePlaying;
+        $('mqToggleWatched').checked = !!snapshot.ScrobbleWatched;
+        renderUserOptions();
+        renderSelected();
+      }).catch(function (err) {
+        console.error('[Marquee] Status error:', err);
+        showState('Disconnected');
+      });
+    }
+
+    function loadUsers() {
+      return ApiClient.getUsers().then(function (users) {
+        jellyfinUsers = (users || []).map(function (u) { return { Id: u.Id, Name: u.Name }; });
+      }).catch(function (err) {
+        console.error('[Marquee] Could not list Jellyfin users:', err);
+        jellyfinUsers = [];
+      });
+    }
+
+    function describeError(err) {
+      if (!err) return 'Unknown error';
+      if (err.status !== undefined) {
+        return 'HTTP ' + err.status + (err.statusText ? ' ' + err.statusText : '');
+      }
+      if (err.message) return err.message;
+      return String(err);
+    }
+
+    function alertError(prefix, err) {
+      Dashboard.hideLoadingMsg();
+      console.error('[Marquee]', prefix, err);
+      Dashboard.alert({ message: prefix + ': ' + describeError(err), title: 'Marquee' });
+    }
+
+    function startPairing() {
+      var user = selectedUser();
+      if (!user) return;
+
+      Dashboard.showLoadingMsg();
+      postJson('ConnectStart', { UserId: user.Id, UserName: user.Name })
+        .then(function (res) { return res.json(); })
+        .then(function (code) {
+          Dashboard.hideLoadingMsg();
+          $('mqUserCode').textContent = code.user_code;
+          if (code.verification_url) {
+            $('mqVerificationLink').href = code.verification_url;
+            $('mqVerificationLink').textContent = code.verification_url;
+          }
+          $('mqPairingStatus').textContent = 'Waiting for confirmation…';
+          showState('Pairing');
+          stopPolling();
+          pollTimer = setInterval(pollForToken, POLL_INTERVAL_MS);
+        })
+        .catch(function (err) { alertError('Could not start pairing', err); });
+    }
+
+    function pollForToken() {
+      ApiClient.ajax({ type: 'POST', url: apiUrl('Poll') })
+        .then(function (res) { return res.json(); })
+        .then(function (result) {
+          if (result.Status === 'connected') {
+            stopPolling();
+            if (result.StaleLinksRemoved) {
+              Dashboard.alert({
+                title: 'Marquee',
+                message: 'That Marquee account was already linked to another Jellyfin account on this server. The older link was removed.'
+              });
+            }
+            refreshStatus();
+          } else if (result.Status === 'expired_token') {
+            stopPolling();
+            $('mqPairingStatus').textContent = 'Code expired. Please start again.';
+            setTimeout(renderSelected, 2500);
+          } else if (result.Status === 'authorization_pending') {
+            $('mqPairingStatus').textContent = 'Waiting for confirmation…';
+          } else if (result.Status === 'no_pending_code') {
+            stopPolling();
+            renderSelected();
+          } else {
+            $('mqPairingStatus').textContent = 'Status: ' + result.Status;
+          }
+        })
+        .catch(function () {
+          $('mqPairingStatus').textContent = 'Network error. Retrying…';
+        });
+    }
+
+    function cancelPairing() {
+      stopPolling();
+      postJson('CancelPairing').catch(function () { /* best effort */ });
+      renderSelected();
+    }
+
+    function disconnect() {
+      var user = selectedUser();
+      if (!user) return;
+      if (!confirm('Disconnect ' + user.Name + ' from Marquee? Their playback will stop scrobbling until reconnected.')) return;
+
+      Dashboard.showLoadingMsg();
+      postJson('Disconnect', { UserId: user.Id })
+        .then(function () {
+          Dashboard.hideLoadingMsg();
+          refreshStatus();
+        })
+        .catch(function (err) { alertError('Could not disconnect', err); });
+    }
+
+    function saveSettings() {
+      Dashboard.showLoadingMsg();
+      postJson('Settings', {
+        ApiBaseUrl: $('mqApiUrl').value,
+        ScrobblePlaying: $('mqTogglePlaying').checked,
+        ScrobbleWatched: $('mqToggleWatched').checked
+      })
+        .then(function () {
+          Dashboard.hideLoadingMsg();
+          $('mqSaveStatus').textContent = 'Saved.';
+          setTimeout(function () { $('mqSaveStatus').textContent = ''; }, 3000);
+        })
+        .catch(function (err) { alertError('Could not save settings', err); });
+    }
+
+    function bind() {
+      if (bound) return;
+      bound = true;
+
+      $('mqConnectBtn').addEventListener('click', startPairing);
+      $('mqCancelPairingBtn').addEventListener('click', cancelPairing);
+      $('mqDisconnectBtn').addEventListener('click', disconnect);
+      $('mqSaveBtn').addEventListener('click', saveSettings);
+      $('mqUserSelect').addEventListener('change', renderSelected);
+
+      var playing = $('mqTogglePlaying');
+      var watched = $('mqToggleWatched');
+      if (playing) playing.addEventListener('change', saveSettings);
+      if (watched) watched.addEventListener('change', saveSettings);
+
+      loadUsers().then(refreshStatus);
+    }
+
+    // Jellyfin calls this once the page's DOM is ready.
+    window.addEventListener('DOMContentLoaded', bind);
+    // The web client may also fire this after navigating to the page.
+    document.addEventListener('pageinit', bind);
+    if (document.readyState !== 'loading') bind();
+  })();
+  </script>
+</body>
+</html>

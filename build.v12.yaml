@@ -1,0 +1,16 @@
+# JPRM build descriptor — v12 variant (Jellyfin 12.x, net10.0)
+name: "Marquee"
+guid: "7c2e9f4a-1b3d-4e5f-9a8b-2c4d6e8f0a1b"
+version: "0.2.0.0"
+overview: "Automatic scrobbling to your Marquee profile."
+description: |
+  Sends watched marks from Jellyfin (manual marks, playback completion and
+  automatic played flips) to your Marquee account in real time.
+  Per-account pairing via a short confirmation code.
+category: "General"
+owner: "marquee"
+artifacts:
+  - "Jellyfin.Plugin.Marquee.dll"
+changelog: "Initial release"
+targetAbi: "12.0.0.0"
+framework: "net10.0"
