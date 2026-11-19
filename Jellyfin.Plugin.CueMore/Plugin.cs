@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Jellyfin.Plugin.Marquee.Configuration;
+using Jellyfin.Plugin.CueMore.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 
-namespace Jellyfin.Plugin.Marquee;
+namespace Jellyfin.Plugin.CueMore;
 
 public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 {
@@ -15,13 +15,14 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     {
         Instance = this;
 
-        // One-time migration: installs that saved the old localhost default
-        // (or have no URL) move to the hosted Marquee instance.
+        // One-time migration: installs that saved the old localhost or
+        // pre-rebrand marqueehq default (or have no URL) move to CueMore.
         var cfg = Configuration;
         if (string.IsNullOrWhiteSpace(cfg.ApiBaseUrl) ||
-            cfg.ApiBaseUrl.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase))
+            cfg.ApiBaseUrl.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) ||
+            cfg.ApiBaseUrl.Contains("marqueehq.vercel.app", StringComparison.OrdinalIgnoreCase))
         {
-            cfg.ApiBaseUrl = "https://marqueehq.vercel.app";
+            cfg.ApiBaseUrl = "https://cuemore.vercel.app";
             SaveConfiguration();
         }
     }
@@ -30,9 +31,9 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 
     public override Guid Id => new("7c2e9f4a-1b3d-4e5f-9a8b-2c4d6e8f0a1b");
 
-    public override string Name => "Marquee";
+    public override string Name => "CueMore";
 
-    public override string Description => "Automatic scrobbling to your Marquee profile: what you finish watching in Jellyfin is marked as watched in Marquee.";
+    public override string Description => "Automatic scrobbling to your CueMore profile: what you finish watching in Jellyfin is marked as watched in CueMore.";
 
     public IEnumerable<PluginPageInfo> GetPages() => new[]
     {

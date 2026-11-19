@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 
-namespace Jellyfin.Plugin.Marquee.Scrobbling;
+namespace Jellyfin.Plugin.CueMore.Scrobbling;
 
 /// <summary>
 /// Rate-limits "PlaybackProgress" dispatches per playback session.
 /// Jellyfin raises PlaybackProgress continuously (every few seconds) for
-/// every active session; forwarding each one would flood Marquee. This gate
+/// every active session; forwarding each one would flood CueMore. This gate
 /// lets at most one progress event through per session per
 /// <see cref="MinInterval"/> — 30s keeps the live card feeling fresh without
 /// meaningful traffic.

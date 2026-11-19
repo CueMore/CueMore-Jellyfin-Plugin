@@ -1,25 +1,25 @@
 using System.Linq;
-using Jellyfin.Plugin.Marquee.Api;
-using Jellyfin.Plugin.Marquee.Configuration;
+using Jellyfin.Plugin.CueMore.Api;
+using Jellyfin.Plugin.CueMore.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Jellyfin.Plugin.Marquee.Controllers;
+namespace Jellyfin.Plugin.CueMore.Controllers;
 
 /// <summary>
-/// HTTP endpoints exposed by the plugin under /Plugins/Marquee.
+/// HTTP endpoints exposed by the plugin under /Plugins/CueMore.
 /// Consumed exclusively from configPage.html in the plugin settings page.
 /// All endpoints require Jellyfin admin rights.
 ///
 /// Pairing is per Jellyfin account: the admin picks an account in the
-/// dropdown and that account's owner confirms the short code on Marquee
+/// dropdown and that account's owner confirms the short code on CueMore
 /// while logged in, so the admin never gains access to their profile.
 /// </summary>
 [ApiController]
-[Route("Plugins/Marquee")]
+[Route("Plugins/CueMore")]
 [Authorize(Policy = "RequiresElevation")]
-public class MarqueeController : ControllerBase
+public class CueMoreController : ControllerBase
 {
     private readonly DeviceCodeClient _device;
 
@@ -30,13 +30,13 @@ public class MarqueeController : ControllerBase
     private static string? _pendingJellyfinUserId;
     private static string? _pendingJellyfinUserName;
 
-    public MarqueeController(DeviceCodeClient device)
+    public CueMoreController(DeviceCodeClient device)
     {
         _device = device;
     }
 
     /// <summary>
-    /// Starts pairing for one Jellyfin account: requests a user_code from Marquee.
+    /// Starts pairing for one Jellyfin account: requests a user_code from CueMore.
     /// </summary>
     [HttpPost("ConnectStart")]
     public async Task<ActionResult<DeviceCodeResponse>> ConnectStart([FromBody] ConnectStartDto? dto, CancellationToken ct)
@@ -62,8 +62,8 @@ public class MarqueeController : ControllerBase
     }
 
     /// <summary>
-    /// Polls Marquee for the token of the pending pairing. On success stores
-    /// the link between that Jellyfin account and the Marquee account that
+    /// Polls CueMore for the token of the pending pairing. On success stores
+    /// the link between that Jellyfin account and the CueMore account that
     /// confirmed the code.
     /// </summary>
     [HttpPost("Poll")]
@@ -83,18 +83,18 @@ public class MarqueeController : ControllerBase
         {
             var userId = _pendingJellyfinUserId!;
             var userName = _pendingJellyfinUserName ?? string.Empty;
-            var marqueeUser = result.Username ?? string.Empty;
+            var cuemoreUser = result.Username ?? string.Empty;
 
             cfg.UserLinks ??= new List<UserLink>();
 
-            // A Marquee account holds a single Jellyfin scrobble token per
-            // Jellyfin user. If this Marquee account was already linked to
+            // A CueMore account holds a single Jellyfin scrobble token per
+            // Jellyfin user. If this CueMore account was already linked to
             // another Jellyfin account on this server, that older link now
             // points at a dead token — drop it instead of leaving it broken.
             var stale = cfg.UserLinks
                 .Where(l => !string.Equals(l.JellyfinUserId, userId, StringComparison.OrdinalIgnoreCase)
-                            && !string.IsNullOrEmpty(l.MarqueeUsername)
-                            && string.Equals(l.MarqueeUsername, marqueeUser, StringComparison.OrdinalIgnoreCase))
+                            && !string.IsNullOrEmpty(l.CueMoreUsername)
+                            && string.Equals(l.CueMoreUsername, cuemoreUser, StringComparison.OrdinalIgnoreCase))
                 .ToList();
             foreach (var link in stale) cfg.UserLinks.Remove(link);
 
@@ -107,7 +107,7 @@ public class MarqueeController : ControllerBase
 
             existing.JellyfinUserName = userName;
             existing.ScrobbleToken = result.AccessToken!;
-            existing.MarqueeUsername = marqueeUser;
+            existing.CueMoreUsername = cuemoreUser;
             existing.LinkedAt = DateTime.UtcNow;
             existing.LastScrobbleAt = null;
             existing.ScrobbleCount = 0;
@@ -118,7 +118,7 @@ public class MarqueeController : ControllerBase
             return Ok(new PollStatus
             {
                 Status = "connected",
-                Username = marqueeUser,
+                Username = cuemoreUser,
                 UserId = userId,
                 StaleLinksRemoved = stale.Count
             });
@@ -166,7 +166,7 @@ public class MarqueeController : ControllerBase
             {
                 UserId = l.JellyfinUserId,
                 UserName = l.JellyfinUserName,
-                Username = l.MarqueeUsername,
+                Username = l.CueMoreUsername,
                 LastScrobbleAt = l.LastScrobbleAt,
                 ScrobbleCount = l.ScrobbleCount,
                 Invalid = l.Invalid,
@@ -180,7 +180,7 @@ public class MarqueeController : ControllerBase
         };
     }
 
-    /// <summary>Update plugin-wide settings (Marquee URL, event toggles).</summary>
+    /// <summary>Update plugin-wide settings (CueMore URL, event toggles).</summary>
     [HttpPost("Settings")]
     public IActionResult Settings([FromBody] SettingsUpdateDto? dto)
     {

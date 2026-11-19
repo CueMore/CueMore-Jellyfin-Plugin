@@ -1,5 +1,5 @@
-using Jellyfin.Plugin.Marquee.Configuration;
-using Jellyfin.Plugin.Marquee.Api;
+using Jellyfin.Plugin.CueMore.Configuration;
+using Jellyfin.Plugin.CueMore.Api;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
@@ -9,17 +9,17 @@ using MediaBrowser.Model.Entities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Marquee.Scrobbling;
+namespace Jellyfin.Plugin.CueMore.Scrobbling;
 
 /// <summary>
 /// Subscribes to Jellyfin session + user-data events and forwards them to
-/// Marquee. Runs as an IHostedService — Jellyfin lifecycle-manages it.
+/// CueMore. Runs as an IHostedService — Jellyfin lifecycle-manages it.
 ///
 /// Event translation:
 ///   PlaybackStart    -> "PlaybackStart"   (live now-playing + position seed)
 ///   PlaybackProgress -> "PlaybackProgress" (throttled to one per 30s per
-///                       session — keeps Marquee's live card fresh)
-///   PlaybackStopped  -> "PlaybackStop"    (always sent so Marquee clears the
+///                       session — keeps CueMore's live card fresh)
+///   PlaybackStopped  -> "PlaybackStop"    (always sent so CueMore clears the
 ///                       live session; played=true only when the position
 ///                       reached ~90% of the runtime — Jellyfin's own
 ///                       PlayedToCompletion flag is also true for stops on
@@ -31,14 +31,14 @@ namespace Jellyfin.Plugin.Marquee.Scrobbling;
 ///     never reports the item as stopped — e.g. autoplay into the next episode)
 ///
 /// Only Movie and Episode items are dispatched, and only for Jellyfin
-/// accounts paired with a Marquee account. Failures are logged and
+/// accounts paired with a CueMore account. Failures are logged and
 /// swallowed — scrobble must never break playback.
 /// </summary>
 public class ScrobbleManager : IHostedService
 {
     private readonly ISessionManager _sessions;
     private readonly IUserDataManager _userData;
-    private readonly MarqueeClient _client;
+    private readonly CueMoreClient _client;
     private readonly PayloadBuilder _builder;
     private readonly PlayedStateTracker _playedState;
     private readonly ProgressPlayedTracker _progressPlayed;
@@ -48,7 +48,7 @@ public class ScrobbleManager : IHostedService
     public ScrobbleManager(
         ISessionManager sessions,
         IUserDataManager userData,
-        MarqueeClient client,
+        CueMoreClient client,
         PayloadBuilder builder,
         PlayedStateTracker playedState,
         ProgressPlayedTracker progressPlayed,
@@ -71,7 +71,7 @@ public class ScrobbleManager : IHostedService
         _sessions.PlaybackProgress += OnPlaybackProgress;
         _sessions.PlaybackStopped  += OnPlaybackStopped;
         _userData.UserDataSaved    += OnUserDataSaved;
-        _logger.LogInformation("[Marquee] ScrobbleManager started: subscribed to playback + user-data events.");
+        _logger.LogInformation("[CueMore] ScrobbleManager started: subscribed to playback + user-data events.");
         return Task.CompletedTask;
     }
 
@@ -81,7 +81,7 @@ public class ScrobbleManager : IHostedService
         _sessions.PlaybackProgress -= OnPlaybackProgress;
         _sessions.PlaybackStopped  -= OnPlaybackStopped;
         _userData.UserDataSaved    -= OnUserDataSaved;
-        _logger.LogInformation("[Marquee] ScrobbleManager stopped.");
+        _logger.LogInformation("[CueMore] ScrobbleManager stopped.");
         return Task.CompletedTask;
     }
 
@@ -100,7 +100,7 @@ public class ScrobbleManager : IHostedService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] OnPlaybackStart threw");
+            _logger.LogWarning(ex, "[CueMore] OnPlaybackStart threw");
         }
     }
 
@@ -116,7 +116,7 @@ public class ScrobbleManager : IHostedService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] OnPlaybackProgress threw");
+            _logger.LogWarning(ex, "[CueMore] OnPlaybackProgress threw");
         }
     }
 
@@ -136,7 +136,7 @@ public class ScrobbleManager : IHostedService
             // item that was ALREADY marked played (rewatches), so a 2-minute
             // dip into a rewatch would scrobble. Require real progress
             // through the file — same ~90% bar Jellyfin uses for its own
-            // auto played-mark. The stop event is sent either way so Marquee
+            // auto played-mark. The stop event is sent either way so CueMore
             // clears the live session.
             var played = ratio >= 0.9 || (e.PlayedToCompletion && runtimeTicks <= 0);
 
@@ -144,7 +144,7 @@ public class ScrobbleManager : IHostedService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] OnPlaybackStopped threw");
+            _logger.LogWarning(ex, "[CueMore] OnPlaybackStopped threw");
         }
     }
 
@@ -179,20 +179,20 @@ public class ScrobbleManager : IHostedService
                 return;
             }
 
-            // Un-marks carry no watch history for Marquee — only send plays.
+            // Un-marks carry no watch history for CueMore — only send plays.
             if (!e.UserData.Played) return;
 
             _ = DispatchUserDataAsync(e, "ItemMarkedPlayed");
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] OnUserDataSaved threw");
+            _logger.LogWarning(ex, "[CueMore] OnUserDataSaved threw");
         }
     }
 
     /// <summary>
     /// Forwards the played mark Jellyfin sets on its own once playback passes
-    /// MaxResumePct, so the item is watched on Marquee even if the client
+    /// MaxResumePct, so the item is watched on CueMore even if the client
     /// never reports the stop. Runs on every progress tick: keep it cheap.
     /// </summary>
     private void OnPlaybackProgressSaved(UserDataSaveEventArgs e)
@@ -230,7 +230,7 @@ public class ScrobbleManager : IHostedService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] UserDataSaved dispatch failed for event {Event}", eventName);
+            _logger.LogWarning(ex, "[CueMore] UserDataSaved dispatch failed for event {Event}", eventName);
         }
     }
 
@@ -253,7 +253,7 @@ public class ScrobbleManager : IHostedService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] Dispatch failed for event {Event}", eventName);
+            _logger.LogWarning(ex, "[CueMore] Dispatch failed for event {Event}", eventName);
         }
     }
 

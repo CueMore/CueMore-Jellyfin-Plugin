@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using MediaBrowser.Model.Plugins;
 
-namespace Jellyfin.Plugin.Marquee.Configuration;
+namespace Jellyfin.Plugin.CueMore.Configuration;
 
 public class PluginConfiguration : BasePluginConfiguration
 {
     public PluginConfiguration()
     {
-        ApiBaseUrl = "https://marqueehq.vercel.app";
+        ApiBaseUrl = "https://cuemore.vercel.app";
         UserLinks = new List<UserLink>();
         ScrobblePlaying = true;
         ScrobbleWatched = true;
     }
 
     /// <summary>
-    /// Base URL of the Marquee instance (https://marqueehq.vercel.app).
+    /// Base URL of the CueMore instance (https://cuemore.vercel.app).
     /// </summary>
     public string ApiBaseUrl { get; set; }
 
     /// <summary>
-    /// One entry per Jellyfin account paired with a Marquee account. Accounts
+    /// One entry per Jellyfin account paired with a CueMore account. Accounts
     /// with no entry here are not scrobbled at all.
     /// </summary>
     public List<UserLink> UserLinks { get; set; }
@@ -77,7 +77,7 @@ public class ScrobbleTarget
 }
 
 /// <summary>
-/// Pairing between one Jellyfin account and one Marquee account.
+/// Pairing between one Jellyfin account and one CueMore account.
 /// </summary>
 public class UserLink
 {
@@ -87,11 +87,11 @@ public class UserLink
     /// <summary>Jellyfin username at pairing time. Display only — ids are what match.</summary>
     public string JellyfinUserName { get; set; } = string.Empty;
 
-    /// <summary>Scrobble token issued by Marquee for this account's profile.</summary>
+    /// <summary>Scrobble token issued by CueMore for this account's profile.</summary>
     public string ScrobbleToken { get; set; } = string.Empty;
 
-    /// <summary>Marquee display name, shown in the config page.</summary>
-    public string MarqueeUsername { get; set; } = string.Empty;
+    /// <summary>CueMore display name, shown in the config page.</summary>
+    public string CueMoreUsername { get; set; } = string.Empty;
 
     public DateTime? LinkedAt { get; set; }
 
@@ -99,6 +99,6 @@ public class UserLink
 
     public long ScrobbleCount { get; set; }
 
-    /// <summary>Marquee answered 401: the token was revoked or replaced. Pair again.</summary>
+    /// <summary>CueMore answered 401: the token was revoked or replaced. Pair again.</summary>
     public bool Invalid { get; set; }
 }

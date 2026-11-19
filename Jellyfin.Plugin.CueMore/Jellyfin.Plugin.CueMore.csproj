@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <RootNamespace>Jellyfin.Plugin.Marquee</RootNamespace>
-    <AssemblyName>Jellyfin.Plugin.Marquee</AssemblyName>
+    <RootNamespace>Jellyfin.Plugin.CueMore</RootNamespace>
+    <AssemblyName>Jellyfin.Plugin.CueMore</AssemblyName>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
@@ -13,7 +13,7 @@
     <Company>TheMarqueerepo</Company>
     <RepositoryUrl>https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-</RepositoryUrl>
     <PackageProjectUrl>https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-</PackageProjectUrl>
-    <PackageTags>jellyfin;plugin;scrobble;marquee</PackageTags>
+    <PackageTags>jellyfin;plugin;scrobble;cuemore</PackageTags>
   </PropertyGroup>
 
   <!-- API line differences (see Compat.cs): 10.10 on net8, 12.x on net10;

@@ -3,10 +3,10 @@ using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Entities;
 
-namespace Jellyfin.Plugin.Marquee.Scrobbling;
+namespace Jellyfin.Plugin.CueMore.Scrobbling;
 
 /// <summary>
-/// Maps Jellyfin SessionInfo + item data into the Marquee scrobble payload.
+/// Maps Jellyfin SessionInfo + item data into the CueMore scrobble payload.
 /// Only Movie and Episode kinds are supported — anything else is filtered
 /// out upstream and never reaches the builder.
 /// </summary>

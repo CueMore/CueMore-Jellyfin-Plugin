@@ -1,11 +1,11 @@
-using Jellyfin.Plugin.Marquee.Api;
-using Jellyfin.Plugin.Marquee.Configuration;
-using Jellyfin.Plugin.Marquee.Scrobbling;
+using Jellyfin.Plugin.CueMore.Api;
+using Jellyfin.Plugin.CueMore.Configuration;
+using Jellyfin.Plugin.CueMore.Scrobbling;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Jellyfin.Plugin.Marquee;
+namespace Jellyfin.Plugin.CueMore;
 
 /// <summary>
 /// Registers plugin services with Jellyfin's DI container.
@@ -16,9 +16,9 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
 {
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
-        serviceCollection.AddHttpClient(HttpClientNames.Marquee);
+        serviceCollection.AddHttpClient(HttpClientNames.CueMore);
 
-        serviceCollection.AddSingleton<MarqueeClient>();
+        serviceCollection.AddSingleton<CueMoreClient>();
         serviceCollection.AddSingleton<DeviceCodeClient>();
         serviceCollection.AddSingleton<PlayedStateTracker>();
         serviceCollection.AddSingleton<ProgressPlayedTracker>();
@@ -32,5 +32,5 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
 
 public static class HttpClientNames
 {
-    public const string Marquee = "Marquee";
+    public const string CueMore = "CueMore";
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 
-namespace Jellyfin.Plugin.Marquee.Scrobbling;
+namespace Jellyfin.Plugin.CueMore.Scrobbling;
 
 /// <summary>
 /// Suppresses "ItemMarkedPlayed" dispatches that do not actually change the

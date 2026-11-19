@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 
-namespace Jellyfin.Plugin.Marquee.Scrobbling;
+namespace Jellyfin.Plugin.CueMore.Scrobbling;
 
 /// <summary>
-/// JSON shape POSTed to /api/jellyfin/plugin/scrobble on the Marquee server.
+/// JSON shape POSTed to /api/jellyfin/plugin/scrobble on the CueMore server.
 /// </summary>
 public class ScrobblePayload
 {

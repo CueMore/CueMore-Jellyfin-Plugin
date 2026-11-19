@@ -46,7 +46,7 @@ jobs:
             --dotnet-framework=net8.0 \
             --version=${{ steps.ver.outputs.assembly }}
           ORIG=$(ls artifacts-lts/*.zip | head -1)
-          mv "$ORIG" "artifacts-lts/$(basename "$ORIG" .zip)_net8.zip"
+          mv "$ORIG" "artifacts-lts/cuemore_${{ steps.ver.outputs.assembly }}_net8.zip"
 
       - name: Build Stable variant (net9.0 / Jellyfin 10.11.x)
         run: |
@@ -59,7 +59,7 @@ jobs:
             --dotnet-framework=net9.0 \
             --version=${{ steps.ver.outputs.assembly }}
           ORIG=$(ls artifacts-stable/*.zip | head -1)
-          mv "$ORIG" "artifacts-stable/$(basename "$ORIG" .zip)_net9.zip"
+          mv "$ORIG" "artifacts-stable/cuemore_${{ steps.ver.outputs.assembly }}_net9.zip"
 
       - name: Build v12 variant (net10.0 / Jellyfin 12.x)
         run: |
@@ -72,7 +72,7 @@ jobs:
             --dotnet-framework=net10.0 \
             --version=${{ steps.ver.outputs.v12 }}
           ORIG=$(ls artifacts-v12/*.zip | head -1)
-          mv "$ORIG" "artifacts-v12/$(basename "$ORIG" .zip)_net10.zip"
+          mv "$ORIG" "artifacts-v12/cuemore_${{ steps.ver.outputs.v12 }}_net10.zip"
 
       - name: Upload the three ZIPs to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -103,7 +103,7 @@ jobs:
           LTS_ENTRY=$(jq -nc \
             --arg version "$VERSION" \
             --arg changelog "$RELEASE_PAGE" \
-            --arg sourceUrl "${DL}/marquee_${VERSION}_net8.zip" \
+            --arg sourceUrl "${DL}/cuemore_${VERSION}_net8.zip" \
             --arg checksum "$MD5_LTS" \
             --arg timestamp "$TS" \
             '{version:$version, changelog:$changelog, targetAbi:"10.10.7.0", sourceUrl:$sourceUrl, checksum:$checksum, timestamp:$timestamp}')
@@ -111,7 +111,7 @@ jobs:
           STABLE_ENTRY=$(jq -nc \
             --arg version "$VERSION" \
             --arg changelog "$RELEASE_PAGE" \
-            --arg sourceUrl "${DL}/marquee_${VERSION}_net9.zip" \
+            --arg sourceUrl "${DL}/cuemore_${VERSION}_net9.zip" \
             --arg checksum "$MD5_STABLE" \
             --arg timestamp "$TS" \
             '{version:$version, changelog:$changelog, targetAbi:"10.11.8.0", sourceUrl:$sourceUrl, checksum:$checksum, timestamp:$timestamp}')
@@ -119,27 +119,27 @@ jobs:
           V12_ENTRY=$(jq -nc \
             --arg version "$V12_VERSION" \
             --arg changelog "$RELEASE_PAGE" \
-            --arg sourceUrl "${DL}/marquee_${V12_VERSION}_net10.zip" \
+            --arg sourceUrl "${DL}/cuemore_${V12_VERSION}_net10.zip" \
             --arg checksum "$MD5_V12" \
             --arg timestamp "$TS" \
             '{version:$version, changelog:$changelog, targetAbi:"12.0.0.0", sourceUrl:$sourceUrl, checksum:$checksum, timestamp:$timestamp}')
 
           GUID="7c2e9f4a-1b3d-4e5f-9a8b-2c4d6e8f0a1b"
-          DESC="Automatic scrobbling to your Marquee profile. Finished movies and episodes in Jellyfin are marked as watched in Marquee. One-click pairing via code."
-          OVERVIEW="Automatic scrobbling to your Marquee profile."
-          IMG="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/branding/marquee.png"
+          DESC="Automatic scrobbling to your CueMore profile. Finished movies and episodes in Jellyfin are marked as watched in CueMore. One-click pairing via code."
+          OVERVIEW="Automatic scrobbling to your CueMore profile."
+          IMG="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/branding/cuemore.png"
 
           jq -n \
             --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" --arg img "$IMG" \
             --argjson stable "$STABLE_ENTRY" --argjson v12 "$V12_ENTRY" \
-            '[{category:"General", guid:$guid, name:"Marquee", description:$desc, overview:$overview, owner:"TheMarqueerepo", imageUrl:$img, versions:[$v12, $stable]}]' \
+            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"TheMarqueerepo", imageUrl:$img, versions:[$v12, $stable]}]' \
             > manifest.json
 
           mkdir -p lts
           jq -n \
             --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" --arg img "$IMG" \
             --argjson lts "$LTS_ENTRY" \
-            '[{category:"General", guid:$guid, name:"Marquee", description:$desc, overview:$overview, owner:"TheMarqueerepo", imageUrl:$img, versions:[$lts]}]' \
+            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"TheMarqueerepo", imageUrl:$img, versions:[$lts]}]' \
             > lts/manifest.json
 
           git config user.name github-actions

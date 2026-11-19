@@ -2,10 +2,10 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Marquee.Api;
+namespace Jellyfin.Plugin.CueMore.Api;
 
 /// <summary>
-/// Talks to the Marquee device-code pairing endpoints:
+/// Talks to the CueMore device-code pairing endpoints:
 ///   POST /api/jellyfin/plugin/pair/start  -> issues a user_code + device_code
 ///   POST /api/jellyfin/plugin/pair/poll   -> exchanges a confirmed device_code for a scrobble token
 /// </summary>
@@ -23,7 +23,7 @@ public class DeviceCodeClient
     public async Task<DeviceCodeResponse?> RequestCodeAsync(string apiBaseUrl, string jellyfinUserId, string jellyfinUserName, string serverLabel, CancellationToken ct)
     {
         var url = $"{apiBaseUrl.TrimEnd('/')}/api/jellyfin/plugin/pair/start";
-        var http = _factory.CreateClient(HttpClientNames.Marquee);
+        var http = _factory.CreateClient(HttpClientNames.CueMore);
 
         try
         {
@@ -38,7 +38,7 @@ public class DeviceCodeClient
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] Pairing code request failed");
+            _logger.LogWarning(ex, "[CueMore] Pairing code request failed");
             return null;
         }
     }
@@ -46,7 +46,7 @@ public class DeviceCodeClient
     public async Task<DeviceTokenResponse> PollTokenAsync(string apiBaseUrl, string deviceCode, CancellationToken ct)
     {
         var url = $"{apiBaseUrl.TrimEnd('/')}/api/jellyfin/plugin/pair/poll";
-        var http = _factory.CreateClient(HttpClientNames.Marquee);
+        var http = _factory.CreateClient(HttpClientNames.CueMore);
 
         try
         {
@@ -62,7 +62,7 @@ public class DeviceCodeClient
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[Marquee] Pairing poll failed");
+            _logger.LogWarning(ex, "[CueMore] Pairing poll failed");
             return new DeviceTokenResponse { Error = "network_error" };
         }
     }

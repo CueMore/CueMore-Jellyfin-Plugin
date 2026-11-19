@@ -1,23 +1,23 @@
 using System.Net.Http.Json;
-using Jellyfin.Plugin.Marquee.Configuration;
-using Jellyfin.Plugin.Marquee.Scrobbling;
+using Jellyfin.Plugin.CueMore.Configuration;
+using Jellyfin.Plugin.CueMore.Scrobbling;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Marquee.Api;
+namespace Jellyfin.Plugin.CueMore.Api;
 
 /// <summary>
 /// POSTs scrobble payloads to {ApiBaseUrl}/api/jellyfin/plugin/scrobble with
-/// the paired account's token in the x-marquee-token header. One retry on
+/// the paired account's token in the x-cuemore-token header. One retry on
 /// HttpRequestException — scrobble must never throw into the event loop or
 /// Jellyfin playback pipeline. Returns whether the event got through, so
-/// callers only record what Marquee actually received.
+/// callers only record what CueMore actually received.
 /// </summary>
-public class MarqueeClient
+public class CueMoreClient
 {
     private readonly IHttpClientFactory _factory;
-    private readonly ILogger<MarqueeClient> _logger;
+    private readonly ILogger<CueMoreClient> _logger;
 
-    public MarqueeClient(IHttpClientFactory factory, ILogger<MarqueeClient> logger)
+    public CueMoreClient(IHttpClientFactory factory, ILogger<CueMoreClient> logger)
     {
         _factory = factory;
         _logger = logger;
@@ -31,7 +31,7 @@ public class MarqueeClient
         }
 
         var url = $"{config.ApiBaseUrl.TrimEnd('/')}/api/jellyfin/plugin/scrobble";
-        var http = _factory.CreateClient(HttpClientNames.Marquee);
+        var http = _factory.CreateClient(HttpClientNames.CueMore);
         http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent.Value);
 
         for (var attempt = 1; attempt <= 2; attempt++)
@@ -42,20 +42,20 @@ public class MarqueeClient
                 {
                     Content = JsonContent.Create(payload)
                 };
-                request.Headers.TryAddWithoutValidation("x-marquee-token", target.ScrobbleToken);
+                request.Headers.TryAddWithoutValidation("x-cuemore-token", target.ScrobbleToken);
 
                 var response = await http.SendAsync(request, ct).ConfigureAwait(false);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    // Token revoked or rotated on Marquee: mark the link invalid
+                    // Token revoked or rotated on CueMore: mark the link invalid
                     // so it stops producing dead requests until re-paired.
                     if (target.Link != null && Plugin.Instance != null)
                     {
                         target.Link.Invalid = true;
                         Plugin.Instance.SaveConfiguration();
                     }
-                    _logger.LogWarning("[Marquee] Scrobble token rejected (401) — link marked invalid, re-pair required.");
+                    _logger.LogWarning("[CueMore] Scrobble token rejected (401) — link marked invalid, re-pair required.");
                     return false;
                 }
 
@@ -79,11 +79,11 @@ public class MarqueeClient
             }
             catch (HttpRequestException ex) when (attempt == 1)
             {
-                _logger.LogDebug(ex, "[Marquee] POST attempt 1 failed for event {Event}, retrying", payload.Event);
+                _logger.LogDebug(ex, "[CueMore] POST attempt 1 failed for event {Event}, retrying", payload.Event);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "[Marquee] POST failed for event {Event}", payload.Event);
+                _logger.LogWarning(ex, "[CueMore] POST failed for event {Event}", payload.Event);
                 return false;
             }
         }
@@ -95,5 +95,5 @@ internal static class UserAgent
 {
     public static readonly string PluginVersion = typeof(UserAgent).Assembly.GetName().Version?.ToString() ?? "0";
 
-    public static readonly string Value = $"Marquee-Jellyfin/{PluginVersion}";
+    public static readonly string Value = $"CueMore-Jellyfin/{PluginVersion}";
 }

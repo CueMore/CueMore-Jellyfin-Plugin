@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 
-namespace Jellyfin.Plugin.Marquee.Scrobbling;
+namespace Jellyfin.Plugin.CueMore.Scrobbling;
 
 /// <summary>
 /// Detects the moment Jellyfin itself marks an item as played DURING playback.
@@ -11,7 +11,7 @@ namespace Jellyfin.Plugin.Marquee.Scrobbling;
 /// MaxResumePct (90% by default), and saves it with SaveReason.PlaybackProgress.
 /// That is Jellyfin's own "watched" decision, and it happens even when the
 /// client never reports the item as stopped (autoplay into the next episode).
-/// Forwarding it gives Marquee the watched mark without depending on the stop.
+/// Forwarding it gives CueMore the watched mark without depending on the stop.
 ///
 /// Only an OBSERVED flip counts: the item must have been seen unplayed on an
 /// earlier tick of this server's lifetime. Every progress tick of a rewatch
