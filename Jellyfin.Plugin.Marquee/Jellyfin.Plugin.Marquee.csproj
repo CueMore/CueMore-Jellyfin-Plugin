@@ -9,6 +9,11 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Authors>TheMarqueerepo</Authors>
+    <Company>TheMarqueerepo</Company>
+    <RepositoryUrl>https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-</PackageProjectUrl>
+    <PackageTags>jellyfin;plugin;scrobble;marquee</PackageTags>
   </PropertyGroup>
 
   <!-- API line differences (see Compat.cs): 10.10 on net8, 12.x on net10;

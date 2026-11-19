@@ -5,7 +5,8 @@
     "name": "Marquee",
     "description": "Automatic scrobbling to your Marquee profile. Finished movies and episodes in Jellyfin are marked as watched in Marquee. One-click pairing via code.",
     "overview": "Automatic scrobbling to your Marquee profile.",
-    "owner": "marquee",
+    "owner": "TheMarqueerepo",
+    "imageUrl": "https://raw.githubusercontent.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/main/branding/marquee.svg",
     "versions": [
       {
         "version": "0.2.0.1",
