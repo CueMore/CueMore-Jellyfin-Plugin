@@ -23,12 +23,12 @@ Name: `CueMore`. URL — pick the one matching your server:
 
 | Jellyfin server | Repository URL |
 |---|---|
-| 12.x and 10.11.x | `https://raw.githubusercontent.com/TheMarqueerepo/Marquee-Jellyfin-Plugin/main/manifest.json` |
-| 10.10.x (LTS) | `https://raw.githubusercontent.com/TheMarqueerepo/Marquee-Jellyfin-Plugin/main/lts/manifest.json` |
+| 12.x and 10.11.x | `https://raw.githubusercontent.com/CueMore/CueMore-Jellyfin-Plugin/main/manifest.json` |
+| 10.10.x (LTS) | `https://raw.githubusercontent.com/CueMore/CueMore-Jellyfin-Plugin/main/lts/manifest.json` |
 
 Go to **Catalog**, find **CueMore**, install. Restart Jellyfin when prompted.
 
-**Manual install:** alternatively, download the matching zip from [Releases](https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/releases), unzip it into your Jellyfin `plugins/` folder, and restart the server.
+**Manual install:** alternatively, download the matching zip from [Releases](https://github.com/CueMore/CueMore-Jellyfin-Plugin/releases), unzip it into your Jellyfin `plugins/` folder, and restart the server.
 
 ## Setup
 

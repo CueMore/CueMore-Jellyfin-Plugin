@@ -9,10 +9,10 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <Authors>TheMarqueerepo</Authors>
-    <Company>TheMarqueerepo</Company>
-    <RepositoryUrl>https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-</PackageProjectUrl>
+    <Authors>CueMore</Authors>
+    <Company>CueMore</Company>
+    <RepositoryUrl>https://github.com/CueMore/CueMore-Jellyfin-Plugin</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/CueMore/CueMore-Jellyfin-Plugin</PackageProjectUrl>
     <PackageTags>jellyfin;plugin;scrobble;cuemore</PackageTags>
   </PropertyGroup>
 

@@ -132,14 +132,14 @@ jobs:
           jq -n \
             --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" --arg img "$IMG" \
             --argjson stable "$STABLE_ENTRY" --argjson v12 "$V12_ENTRY" \
-            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"TheMarqueerepo", imageUrl:$img, versions:[$v12, $stable]}]' \
+            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"CueMore", imageUrl:$img, versions:[$v12, $stable]}]' \
             > manifest.json
 
           mkdir -p lts
           jq -n \
             --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" --arg img "$IMG" \
             --argjson lts "$LTS_ENTRY" \
-            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"TheMarqueerepo", imageUrl:$img, versions:[$lts]}]' \
+            '[{category:"General", guid:$guid, name:"CueMore", description:$desc, overview:$overview, owner:"CueMore", imageUrl:$img, versions:[$lts]}]' \
             > lts/manifest.json
 
           git config user.name github-actions
