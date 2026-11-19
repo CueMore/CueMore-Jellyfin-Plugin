@@ -70,17 +70,9 @@
         <h2>Marquee</h2>
         <p class="fieldDescription">
           Scrobble what you watch in Jellyfin to your
-          <a href="https://traktlite.vercel.app" target="_blank" rel="noopener">Marquee</a>
+          <a href="https://marqueehq.vercel.app" target="_blank" rel="noopener">Marquee</a>
           profile. Finished movies and episodes are marked as watched automatically.
         </p>
-
-        <div class="inputContainer" style="margin-top:12px; max-width: 480px;">
-          <label class="inputLabel" for="mqApiUrl">Marquee server URL</label>
-          <input id="mqApiUrl" type="text" is="emby-input" />
-          <div class="fieldDescription">
-            The address of your Marquee site — change it if you self-host.
-          </div>
-        </div>
 
         <div style="display:flex; gap:8px; margin-top:12px;">
           <button is="emby-button" id="mqSaveBtn" type="button"><span>Save</span></button>
@@ -266,7 +258,6 @@
     function refreshStatus() {
       return ApiClient.getJSON(apiUrl('Status')).then(function (s) {
         snapshot = s || { Links: [] };
-        $('mqApiUrl').value = snapshot.ApiBaseUrl || '';
         $('mqTogglePlaying').checked = !!snapshot.ScrobblePlaying;
         $('mqToggleWatched').checked = !!snapshot.ScrobbleWatched;
         renderUserOptions();
@@ -377,7 +368,6 @@
     function saveSettings() {
       Dashboard.showLoadingMsg();
       postJson('Settings', {
-        ApiBaseUrl: $('mqApiUrl').value,
         ScrobblePlaying: $('mqTogglePlaying').checked,
         ScrobbleWatched: $('mqToggleWatched').checked
       })

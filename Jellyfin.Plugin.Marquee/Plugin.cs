@@ -14,6 +14,16 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         : base(applicationPaths, xmlSerializer)
     {
         Instance = this;
+
+        // One-time migration: installs that saved the old localhost default
+        // (or have no URL) move to the hosted Marquee instance.
+        var cfg = Configuration;
+        if (string.IsNullOrWhiteSpace(cfg.ApiBaseUrl) ||
+            cfg.ApiBaseUrl.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase))
+        {
+            cfg.ApiBaseUrl = "https://marqueehq.vercel.app";
+            SaveConfiguration();
+        }
     }
 
     public static Plugin? Instance { get; private set; }
