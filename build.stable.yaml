@@ -9,6 +9,7 @@ description: |
   Per-account pairing via a short confirmation code.
 category: "General"
 owner: "cuemore"
+imageUrl: "https://raw.githubusercontent.com/CueMore/CueMore-Jellyfin-Plugin/main/branding/cuemore.png"
 artifacts:
   - "Jellyfin.Plugin.CueMore.dll"
 changelog: "Initial release"
