@@ -83,91 +83,66 @@ jobs:
             artifacts-v12/*_net10.zip
           generate_release_notes: true
 
-      - name: Publish manifests to gh-pages
+      - name: Update repository manifests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-
-          if git ls-remote --exit-code --heads "$REPO_URL" gh-pages >/dev/null 2>&1; then
-            git clone --branch gh-pages "$REPO_URL" gh-pages
-          else
-            mkdir gh-pages
-            ( cd gh-pages && git init -b gh-pages && git remote add origin "$REPO_URL" )
-          fi
-
-          if [ ! -f gh-pages/manifest.json ]; then
-            ( cd gh-pages && jprm repo init . )
-          fi
-
-          OWNER=${GITHUB_REPOSITORY%%/*}
-          NAME=${GITHUB_REPOSITORY##*/}
-          SOURCE_URL="https://${OWNER}.github.io/${NAME}"
-
           VERSION="${{ steps.ver.outputs.assembly }}"
           V12_VERSION="${{ steps.ver.outputs.v12 }}"
-          mkdir -p gh-pages/marquee
-
-          LTS_DEST="gh-pages/marquee/marquee_${VERSION}_net8.zip"
-          STABLE_DEST="gh-pages/marquee/marquee_${VERSION}_net9.zip"
-          V12_DEST="gh-pages/marquee/marquee_${V12_VERSION}_net10.zip"
-          cp artifacts-lts/*_net8.zip "$LTS_DEST"
-          cp artifacts-stable/*_net9.zip "$STABLE_DEST"
-          cp artifacts-v12/*_net10.zip "$V12_DEST"
-
-          LTS_SUM=$(md5sum "$LTS_DEST" | awk '{print $1}')
-          STABLE_SUM=$(md5sum "$STABLE_DEST" | awk '{print $1}')
-          V12_SUM=$(md5sum "$V12_DEST" | awk '{print $1}')
+          TAG="${GITHUB_REF_NAME}"
+          BASE="https://github.com/${GITHUB_REPOSITORY}"
+          DL="${BASE}/releases/download/${TAG}"
+          RELEASE_PAGE="${BASE}/releases/tag/${TAG}"
           TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          RELEASES_URL="https://github.com/${GITHUB_REPOSITORY}/releases"
+
+          MD5_LTS=$(md5sum artifacts-lts/*_net8.zip | awk '{print $1}')
+          MD5_STABLE=$(md5sum artifacts-stable/*_net9.zip | awk '{print $1}')
+          MD5_V12=$(md5sum artifacts-v12/*_net10.zip | awk '{print $1}')
 
           LTS_ENTRY=$(jq -nc \
             --arg version "$VERSION" \
-            --arg changelog "See ${RELEASES_URL}" \
-            --arg sourceUrl "${SOURCE_URL}/marquee/marquee_${VERSION}_net8.zip" \
-            --arg checksum "$LTS_SUM" \
+            --arg changelog "$RELEASE_PAGE" \
+            --arg sourceUrl "${DL}/marquee_${VERSION}_net8.zip" \
+            --arg checksum "$MD5_LTS" \
             --arg timestamp "$TS" \
             '{version:$version, changelog:$changelog, targetAbi:"10.10.7.0", sourceUrl:$sourceUrl, checksum:$checksum, timestamp:$timestamp}')
 
           STABLE_ENTRY=$(jq -nc \
             --arg version "$VERSION" \
-            --arg changelog "See ${RELEASES_URL}" \
-            --arg sourceUrl "${SOURCE_URL}/marquee/marquee_${VERSION}_net9.zip" \
-            --arg checksum "$STABLE_SUM" \
+            --arg changelog "$RELEASE_PAGE" \
+            --arg sourceUrl "${DL}/marquee_${VERSION}_net9.zip" \
+            --arg checksum "$MD5_STABLE" \
             --arg timestamp "$TS" \
             '{version:$version, changelog:$changelog, targetAbi:"10.11.8.0", sourceUrl:$sourceUrl, checksum:$checksum, timestamp:$timestamp}')
 
           V12_ENTRY=$(jq -nc \
             --arg version "$V12_VERSION" \
-            --arg changelog "See ${RELEASES_URL}" \
-            --arg sourceUrl "${SOURCE_URL}/marquee/marquee_${V12_VERSION}_net10.zip" \
-            --arg checksum "$V12_SUM" \
+            --arg changelog "$RELEASE_PAGE" \
+            --arg sourceUrl "${DL}/marquee_${V12_VERSION}_net10.zip" \
+            --arg checksum "$MD5_V12" \
             --arg timestamp "$TS" \
             '{version:$version, changelog:$changelog, targetAbi:"12.0.0.0", sourceUrl:$sourceUrl, checksum:$checksum, timestamp:$timestamp}')
 
-          jq --argjson e "$STABLE_ENTRY" \
-            '.[0].versions = ([$e] + (.[0].versions | map(select(.version != $e.version))))' \
-            gh-pages/manifest.json > gh-pages/manifest.tmp.json
-          mv gh-pages/manifest.tmp.json gh-pages/manifest.json
+          GUID="7c2e9f4a-1b3d-4e5f-9a8b-2c4d6e8f0a1b"
+          DESC="Automatic scrobbling to your Marquee profile. Finished movies and episodes in Jellyfin are marked as watched in Marquee. One-click pairing via code."
+          OVERVIEW="Automatic scrobbling to your Marquee profile."
 
-          jq --argjson e "$V12_ENTRY" \
-            '.[0].versions = ([$e] + (.[0].versions | map(select(.version != $e.version))))' \
-            gh-pages/manifest.json > gh-pages/manifest.tmp.json
-          mv gh-pages/manifest.tmp.json gh-pages/manifest.json
+          jq -n \
+            --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" \
+            --argjson stable "$STABLE_ENTRY" --argjson v12 "$V12_ENTRY" \
+            '[{category:"General", guid:$guid, name:"Marquee", description:$desc, overview:$overview, owner:"marquee", versions:[$v12, $stable]}]' \
+            > manifest.json
 
-          mkdir -p gh-pages/lts
-          if [ ! -f gh-pages/lts/manifest.json ]; then
-            ( cd gh-pages && jprm repo init lts )
-          fi
-          jq --argjson e "$LTS_ENTRY" \
-            '.[0].versions = ([$e] + (.[0].versions | map(select(.version != $e.version))))' \
-            gh-pages/lts/manifest.json > gh-pages/lts/manifest.tmp.json
-          mv gh-pages/lts/manifest.tmp.json gh-pages/lts/manifest.json
+          mkdir -p lts
+          jq -n \
+            --arg guid "$GUID" --arg desc "$DESC" --arg overview "$OVERVIEW" \
+            --argjson lts "$LTS_ENTRY" \
+            '[{category:"General", guid:$guid, name:"Marquee", description:$desc, overview:$overview, owner:"marquee", versions:[$lts]}]' \
+            > lts/manifest.json
 
-          cd gh-pages
           git config user.name github-actions
           git config user.email actions@github.com
-          git add -A
-          git commit -m "release: ${{ steps.ver.outputs.assembly }} (LTS + Stable + v12)" || { echo "nothing to commit"; exit 0; }
-          git push origin gh-pages
+          git add manifest.json lts/manifest.json
+          git commit -m "chore: update plugin manifests for ${TAG}" || { echo "manifests unchanged"; exit 0; }
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main

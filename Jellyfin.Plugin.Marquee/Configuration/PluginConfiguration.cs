@@ -9,15 +9,14 @@ public class PluginConfiguration : BasePluginConfiguration
 {
     public PluginConfiguration()
     {
-        ApiBaseUrl = "http://localhost:3000";
+        ApiBaseUrl = "https://marqueehq.vercel.app";
         UserLinks = new List<UserLink>();
         ScrobblePlaying = true;
         ScrobbleWatched = true;
     }
 
     /// <summary>
-    /// Base URL of the Marquee instance. Default targets a local dev server;
-    /// change it to your deployed Marquee URL (e.g. https://traktlite.vercel.app).
+    /// Base URL of the Marquee instance (https://marqueehq.vercel.app).
     /// </summary>
     public string ApiBaseUrl { get; set; }
 

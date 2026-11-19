@@ -1,0 +1,20 @@
+[
+  {
+    "category": "General",
+    "guid": "7c2e9f4a-1b3d-4e5f-9a8b-2c4d6e8f0a1b",
+    "name": "Marquee",
+    "description": "Automatic scrobbling to your Marquee profile. Finished movies and episodes in Jellyfin are marked as watched in Marquee. One-click pairing via code.",
+    "overview": "Automatic scrobbling to your Marquee profile.",
+    "owner": "marquee",
+    "versions": [
+      {
+        "version": "0.2.0.0",
+        "changelog": "https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/releases/tag/v0.2.0",
+        "targetAbi": "10.10.7.0",
+        "sourceUrl": "https://github.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/releases/download/v0.2.0/marquee_0.2.0.0_net8.zip",
+        "checksum": "110814617a53b267b9213f9ff1b1ffa2",
+        "timestamp": "2026-11-19T14:45:00Z"
+      }
+    ]
+  }
+]

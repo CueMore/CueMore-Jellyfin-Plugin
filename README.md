@@ -23,8 +23,7 @@ Name: `Marquee`. URL — pick the one matching your server:
 
 | Jellyfin server | Repository URL |
 |---|---|
-| 12.x | `https://raw.githubusercontent.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/main/manifest-v12.json` |
-| 10.11.x | `https://raw.githubusercontent.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/main/manifest.json` |
+| 12.x and 10.11.x | `https://raw.githubusercontent.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/main/manifest.json` |
 | 10.10.x (LTS) | `https://raw.githubusercontent.com/TheMarqueerepo/Marquee-Jellyfin-Plugin-/main/lts/manifest.json` |
 
 Go to **Catalog**, find **Marquee**, install. Restart Jellyfin when prompted.
