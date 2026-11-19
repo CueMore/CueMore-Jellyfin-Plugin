@@ -146,9 +146,12 @@ jobs:
           git config user.email actions@github.com
           git add manifest.json lts/manifest.json
           git commit -m "chore: update plugin manifests for ${TAG}" || { echo "manifests unchanged"; exit 0; }
-          # The tag may point at a commit behind main (e.g. tagged before a
-          # merge) — rebase the manifest commit onto main so the push is a
-          # fast-forward instead of being rejected.
+          # The tag may point at a commit behind main, and the build can leave
+          # tracked files dirty — stash them, then cherry-pick the manifest
+          # commit onto main so the push is always a fast-forward.
+          MANIFEST_COMMIT=$(git rev-parse HEAD)
+          git stash push -m "wip" || true
           git fetch "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" main
-          git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+          git checkout -B manifest-push FETCH_HEAD
+          git cherry-pick "$MANIFEST_COMMIT"
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main
